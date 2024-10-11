@@ -29,7 +29,7 @@ async def test_project(dut):
             dut.b_value = b_vals[i]
 
             dut._log.info(f"value of outputs are: {dut.sum.value} and {dut.carry_out.value}.")
-            assert dut.sum.value == ((int(dut.a_value) + int(dut.b_value)) % 16) and dut.carry_out.value == (1 if ((int(dut.a_value) + int(dut.b_value)) >= 16) else 0)
+            assert int(dut.sum.value) == ((int(dut.a_value) + int(dut.b_value)) % 16) and dut.carry_out.value == (1 if ((int(dut.a_value) + int(dut.b_value)) >= 16) else 0)
             await ClockCycles(dut.clk, 10)
             
         
