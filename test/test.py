@@ -24,13 +24,13 @@ async def test_project(dut):
     b_vals = [i for i in range(16)]
     
     for i in range(len(a_vals)):
-        for i in range(len(b_vals)):
+        for j in range(len(b_vals)):
             dut.a.value = a_vals[i]
-            dut.b.value = b_vals[i]
+            dut.b.value = b_vals[j]
             await ClockCycles(dut.clk, 10)
 
             dut._log.info(f"value of outputs are: {dut.sum.value} and {dut.carry_out.value}.")
-            assert int(dut.sum.value) == ((int(a_vals[i]) + int(b_vals[j])) % 16) and dut.carry_out.value == (int(a_vals[i]) + int(b_vals[i]) >= 16)
+            assert int(dut.sum.value) == ((int(a_vals[i]) + int(b_vals[j])) % 16) and dut.carry_out.value == (int(a_vals[i]) + int(b_vals[j]) >= 16)
             
         
     # Wait for one clock cycle to see the output values
