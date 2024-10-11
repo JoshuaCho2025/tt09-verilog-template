@@ -25,8 +25,8 @@ async def test_project(dut):
     
     for i in range(len(a_vals)):
         for i in range(len(b_vals)):
-            dut.a_value = a_vals[i]
-            dut.b_value = b_vals[i]
+            dut.a.value = a_vals[i]
+            dut.b.value = b_vals[i]
             await ClockCycles(dut.clk, 10)
 
             dut._log.info(f"value of outputs are: {dut.sum.value} and {dut.carry_out.value}.")
