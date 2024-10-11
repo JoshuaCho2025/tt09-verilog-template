@@ -30,7 +30,7 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 10)
 
             dut._log.info(f"value of outputs are: {dut.sum.value} and {dut.carry_out.value}.")
-            assert int(dut.sum.value) == ((int(a_vals[i]) + int(b_vals[j])) % 16) and dut.carry_out.value == (int(a_vals[i]) + int(b_vals[i])) >= 16)
+            assert int(dut.sum.value) == ((int(a_vals[i]) + int(b_vals[j])) % 16) and dut.carry_out.value == (int(a_vals[i]) + int(b_vals[i]) >= 16)
             
         
     # Wait for one clock cycle to see the output values
