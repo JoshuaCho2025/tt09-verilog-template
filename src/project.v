@@ -5,6 +5,8 @@
 
 `default_nettype none
 
+`default_nettype none
+
 module tt_um_koggestone_adder4 (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -16,43 +18,46 @@ module tt_um_koggestone_adder4 (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    wire [3:0] a,b;
-    wire [3:0] sum;
-    wire carry_out;
+  wire [3:0] a, b;
+  wire [3:0] sum;
+  wire carry_out;
+  
+  assign a = ui_in[3:0];
+  assign b = ui_in[7:4];
+   
 
-    assign a = ui_in[3:0];
-    assign b = ui_in[7:4];
+  wire [3:0] p; // Propagate
+  wire [3:0] g; // Generate
+  wire [3:0] c; // Carry
 
-    wire [3:0] p;
-    wire [3:0] q;
-    wire [3:0] c;
+  // Precompute generate and propagate signals
+  assign p = a ^ b; // Propagate
+  assign g = a & b; // Generate
 
-    assign p = a ^ b;
-    assign q = a & b;
+  // Stage 1: Compute generate signals for neighbor 1-bit pairs
+  wire g1_1, g1_2, g1_3;
+  assign g1_1 = g[1] | (p[1] & g[0]);   // Combine 1st and 0th bits
+  assign g1_2 = g[2] | (p[2] & g[1]);   // Combine 2nd and 1st bits
+  assign g1_3 = g[3] | (p[3] & g[2]);   // Combine 3rd and 2nd bits
 
-    wire g1_1, g1_2, g1_3;
-    assign g1_1 = g[1] | (p[1] & g[0]);
-    assign g1_2 = g[2] | (p[2] & g[1]);
-    assign g1_3 = g[3] | (p[3] & g[2]);
+  // Stage 2: Compute generate signals for 2-bit groups
+  wire g2_2, g2_3;
+  assign g2_2 = g1_2 | (p[2] & g[0]);   // Combine 2-bit group (2nd and 0th bits)
+  assign g2_3 = g1_3 | (p[3] & g1_1);   // Combine 2-bit group (3rd and 1st bits)
 
-    wire g2_2, g2_3;
-    assign g2_2 = g1_2 | (p[2] & g[0]);
-    assign g2_3 = g1_3 | (p[3] & g1_1);
+  // Compute final carry signals
+  assign c[0] = 0;                      // No carry into the first bit
+  assign c[1] = g[0];                   // Carry for 1st bit
+  assign c[2] = g1_1;                   // Carry for 2nd bit
+  assign c[3] = g2_2;                   // Carry for 3rd bit
+  assign carry_out = g2_3;              // Carry-out
 
-    assign c[0] = 0;
-    assign c[1] = g[0];
-    assign c[2] = g1_1;
-    assign c[3] = g2_2;
-    assign carry_out = g2_3;
+  // Sum computation
+  assign sum = p ^ c;                               // XOR of propagate and carry
 
-    assign sum = p ^ c;
-
-    assign uo_out[3:0] = sum;
-    assign uo_out[4] = carry_out;
-    assign uo_out[7:5] = 3'b000;
-    assign uio_out = 8'b00000000;
-    assign uio_oe = 8'b00000000;
+  assign uo_out[3:0] = sum;
+  assign uo_out[4] = carry_out; 
+  assign uo_out[7:5] = 3'b000;
+  assign uio_out = 8'b00000000;
+  assign uio_oe = 8'b00000000;
 endmodule
-  // All output pins must be assigned. If not used, assign to 0.
-
-  // List all unused inputs to prevent warnings
